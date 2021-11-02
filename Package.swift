@@ -3,18 +3,18 @@
 import PackageDescription
 
 let package = Package(
-    name: "Package",
+    name: "JWWSwiftUI",
     platforms: [
         .iOS(.v14),
         .macOS(.v11),
         .tvOS(.v14)
     ],
     products: [
-        .library(name: "Package", targets: ["Package"]),
+        .library(name: "JWWSwiftUI", targets: ["JWWSwiftUI"]),
     ],
     dependencies: [],
     targets: [
-        .target( name: "Package"),
-        .testTarget(name: "PackageTests", dependencies: ["Package"])
+        .target( name: "JWWSwiftUI"),
+        .testTarget(name: "JWWSwiftUITests", dependencies: ["JWWSwiftUI"])
     ]
 )
