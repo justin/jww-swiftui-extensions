@@ -3,42 +3,40 @@ name: CI
 on:
   push:
     branches: [ main ]
+    paths:
+      - '.github/workflows/ci.yml'
+      - 'Package*'
+      - 'Sources/**'
+      - 'Plugins/**'
+      - 'Tests/**'
+
   pull_request:
     branches: [ main ]
+    paths:
+      - '.github/workflows/ci.yml'
+      - 'Package*'
+      - 'Sources/**'
+      - 'Plugins/**'
+      - 'Tests/**'
 
 jobs:
-  lint:
-    name: Linting
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: SwiftLint
-        uses: norio-nomura/action-swiftlint@3.2.1
-
-  test:
+  tests:
     name: "Unit Tests"
-    runs-on: macos-11
-    env:
-      XCODE_SCHEME: "JWWSwiftUI"
-      DEVELOPER_DIR: "/Applications/Xcode_13.1.app/Contents/Developer"
+    runs-on: macos-12
+    strategy:
+      fail-fast: false
+      matrix:
+        xcode-version: ['^14.0']
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Build and Test (macOS)
-        run: |
-          set -o pipefail && env NSUnbufferedIO=YES
-          xcodebuild build-for-testing -usePackageSupportBuiltinSCM -scheme "$XCODE_SCHEME" -destination "platform=macOS" | xcpretty
+      - name: Ensure Xcode Version
+        uses: maxim-lobanov/setup-xcode@v1
+        id: setup-xcode
+        with:
+          xcode-version: ${{ matrix.xcode-version }}
 
-      - name: Build and Test (iOS)
-        run: |
-          set -o pipefail && env NSUnbufferedIO=YES
-          xcodebuild build-for-testing -usePackageSupportBuiltinSCM -scheme "$XCODE_SCHEME" -destination "platform=iOS Simulator,OS=latest,name=iPhone 12" | xcpretty
-
-      - name: Build and Test (tvOS)
-        run: |
-          set -o pipefail && env NSUnbufferedIO=YES
-          xcodebuild build-for-testing -usePackageSupportBuiltinSCM -scheme "$XCODE_SCHEME" -destination "platform=tvOS Simulator,OS=latest,name=Apple TV 4K" | xcpretty
+      - name: Build and Test
+        run: swift test
