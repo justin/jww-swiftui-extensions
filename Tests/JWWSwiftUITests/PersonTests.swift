@@ -1,5 +1,5 @@
 import XCTest
-@testable import Package
+@testable import JWWSwiftUI
 
 /// Tests to validate the `Person` type.
 final class PersonTests: XCTestCase {
